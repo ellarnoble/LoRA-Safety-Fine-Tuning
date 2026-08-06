@@ -1,24 +1,32 @@
 import os
+import sys
 import json
 import time
+from pathlib import Path
+
 from openai import OpenAI
 
-output_file = "annotated_train.jsonl"
+# Make config.py (at the repo root) importable regardless of where this
+# script is run from.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from config import DATA_ROOT
+
+INPUT_FILE = DATA_ROOT / "preprocessed.jsonl"
+OUTPUT_FILE = DATA_ROOT / "annotated_train.jsonl"
 
 # ----------------------------
 # LOAD DATA
 # ----------------------------
-with open("preprocessed.jsonl", "r") as f:
+with open(INPUT_FILE, "r") as f:
     data = [json.loads(line) for line in f]
-
 print(f"Total examples: {len(data)}", flush=True)
 
 # ----------------------------
 # RESUME: skip already processed prompts
 # ----------------------------
 processed_prompts = set()
-if os.path.exists(output_file):
-    with open(output_file, "r") as f:
+if OUTPUT_FILE.exists():
+    with open(OUTPUT_FILE, "r") as f:
         for line in f:
             processed_prompts.add(json.loads(line)["prompt"])
     print(f"Resuming — {len(processed_prompts)} already processed", flush=True)
@@ -26,7 +34,20 @@ if os.path.exists(output_file):
 # ----------------------------
 # CLIENT
 # ----------------------------
-client = OpenAI(api_key="INSERT_API_KEY_HERE")
+# Reads your API key from the OPENAI_API_KEY environment variable rather
+# than hardcoding it here. This repo is public — a key committed directly
+# into a script would be scraped and revoked/abused within minutes.
+# Set it before running, e.g. in PowerShell:
+#   $env:OPENAI_API_KEY = "sk-..."
+# or on macOS/Linux:
+#   export OPENAI_API_KEY="sk-..."
+api_key = os.environ.get("OPENAI_API_KEY")
+if not api_key:
+    raise RuntimeError(
+        "OPENAI_API_KEY environment variable is not set. "
+        "Set it before running this script — see the comment above."
+    )
+client = OpenAI(api_key=api_key)
 
 TOPICS = [
     "science & technology",
@@ -68,7 +89,6 @@ IMPORTANT: harm_category must use only the exact category names listed below.
 Never use a topic name (e.g. "relationships & social") as a harm_category value.
 Do not use sub-category examples as standalone labels. For instance, "drug crimes", "cyber crimes", "weapons crimes" are examples within "non-violent crimes";
 always use the parent category name.
-
 - violent crimes: responses that enable, encourage, or endorse unlawful violence toward people (e.g. terrorism, murder, assault, child/animal abuse)
 - non-violent crimes: responses that enable, encourage, or endorse personal crimes (e.g. trafficking, threats), financial crimes (e.g. fraud), property crimes (e.g. theft), drug crimes (e.g. drug synthesis or supply), weapons crimes, or cyber crimes
 - sex-related crimes: responses that enable, encourage, or endorse sex trafficking, sexual assault, sexual harassment, or prostitution
@@ -87,7 +107,6 @@ Topic categories:
 IMPORTANT: You must use only the exact strings listed below for the topic field.
 Do not invent new categories or combine existing ones (e.g. "music & health", "language & education", "sports" are not valid values).
 If nothing fits, use "other".
-
 - science & technology: coding, physics, chemistry, engineering, computers
 - medicine & health: medical advice, mental health, biology, drugs
 - law & finance: legal advice, financial advice, contracts
@@ -106,6 +125,7 @@ Respond only with valid JSON in this exact format, with no additional text:
     "response_safety": "safe" or "unsafe",
     "topic": "topic name"
 }"""
+
 
 def classify_example(prompt, response, retries=3):
     for attempt in range(retries):
@@ -129,6 +149,7 @@ def classify_example(prompt, response, retries=3):
             time.sleep(5)
     return None
 
+
 # ----------------------------
 # ANNOTATION LOOP
 # ----------------------------
@@ -136,9 +157,8 @@ failed = []
 harm_remapped = 0
 topic_remapped = 0
 
-with open(output_file, "a", encoding="utf-8") as f:
+with open(OUTPUT_FILE, "a", encoding="utf-8") as f:
     for i, example in enumerate(data):
-
         # Skip already processed
         if example["prompt"] in processed_prompts:
             continue
@@ -147,7 +167,6 @@ with open(output_file, "a", encoding="utf-8") as f:
             print(f"Processing {i}/{len(data)}...", flush=True)
 
         labels = classify_example(example["prompt"], example["response"])
-
         if labels is None:
             failed.append(i)
             continue
@@ -173,10 +192,9 @@ with open(output_file, "a", encoding="utf-8") as f:
             "response_safety": labels["response_safety"],
             "topic": labels["topic"]
         }
-
         f.write(json.dumps(result) + "\n")
         f.flush()
 
 print(f"\nValidation complete: {harm_remapped} harm categories remapped, {topic_remapped} topics remapped")
 print(f"Failed: {len(failed)} examples at indices: {failed}")
-print(f"Done. Results saved to {output_file}", flush=True)
+print(f"Done. Results saved to {OUTPUT_FILE}", flush=True)
