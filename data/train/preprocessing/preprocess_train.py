@@ -1,4 +1,6 @@
 import json
+import sys
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -7,15 +9,19 @@ from datasets import load_dataset, concatenate_datasets, Dataset
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
-USERNAME = "f42827en"
-PKU_file = f"/scratch/{USERNAME}/data/pku_train.jsonl"
-HH_file = f"/scratch/{USERNAME}/data/hh_train.jsonl"
-BT_file = f"/scratch/{USERNAME}/data/bt_train.jsonl"
-WG_file = f"/scratch/{USERNAME}/data/wg_train.parquet"
+# Make config.py (at the repo root) importable regardless of where this
+# script is run from.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from config import DATA_ROOT
 
-# Used for the leakage check below. Adjust if your test split lives
-# somewhere else.
-TEST_file = f"/scratch/{USERNAME}/data/test.jsonl"
+PKU_file = str(DATA_ROOT / "pku_train.jsonl")
+HH_file = str(DATA_ROOT / "hh_train.jsonl")
+BT_file = str(DATA_ROOT / "bt_train.jsonl")
+WG_file = str(DATA_ROOT / "wg_train.parquet")
+
+# Used for the leakage check below. Adjust in config.py if your test split
+# lives somewhere else.
+TEST_file = DATA_ROOT / "test.jsonl"
 
 MIN_RESPONSE_LENGTH = 25
 
@@ -25,7 +31,7 @@ EMBED_BATCH_SIZE = 64
 
 # Single final output of this whole script. Your GPT annotation script runs
 # on this file afterwards to produce annotated_train.xlsx.
-OUTPUT_FILE = f"/scratch/{USERNAME}/data/preprocessed.jsonl"
+OUTPUT_FILE = DATA_ROOT / "preprocessed.jsonl"
 
 # ----------------------------
 # LOAD PKU DATASET
