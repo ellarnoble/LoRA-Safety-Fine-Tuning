@@ -7,24 +7,24 @@ Falcon-7B, Mistral-7B, and Qwen-7B.
 ## Repo layout
 
 ```
-config.py                          # edit this before running anything
+config.py                       
 requirements.txt
-data/                               # committed, ready-to-use data artifacts
+data/                            
   test/test.jsonl
   train/annotated_train.xlsx
   train/train.jsonl
 preprocessing/
-  preprocess_train.py               # source datasets -> preprocessed.jsonl
+  preprocess_train.py               
 capabilities_evaluation/
   scripts/
-    predownload_evaltasks.py        # run once, CSF3 login node only
+    predownload_evaltasks.py      
     falcon_eval.py
     mistral_eval.py
     qwen_eval.py
     aggregate_falcon_eval.py
     aggregate_mistral_eval.py
     aggregate_qwen_eval.py
-    run_all_evals.py                # orchestrates all six scripts above
+    run_all_evals.py             
 ```
 
 ## Setup
