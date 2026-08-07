@@ -1,20 +1,6 @@
 """
 LlamaGuard-based safety evaluation of a generate.py output file.
 
-Previously the input/output/debug filenames were hard-coded at the bottom of
-this script (qwen7b_full_responses.jsonl etc) and had to be edited by hand
-for every one of the 42 conditions.
-
-Two ways to point this at a condition:
-
-  1. --model/--condition[/--rank/--placement], matching generate.py exactly --
-     input/output/debug paths are all derived from config.py automatically
-     (input from config.generate_output_file, output+debug under
-     EVAL_OUTPUT_ROOT/safety/<model>/ via config.safety_eval_paths).
-  2. --input plus --output/--debug, for evaluating an arbitrary file that
-     doesn't follow the config.py layout (e.g. a one-off run, or output from
-     someone else's pipeline).
-
 Usage
 -----
     python llamaguard_evaluate.py --model qwen7b --condition full
