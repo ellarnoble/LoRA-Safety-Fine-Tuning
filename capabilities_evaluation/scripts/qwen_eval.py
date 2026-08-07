@@ -1,11 +1,9 @@
 """
-Run IFEval + MMLU across the base Qwen-7B model and all LoRA
+Run IFEval + MMLU across the base Qwen-7B model, full FT model and all 12 LoRA
 conditions (4 ranks x 3 placements).
 
 Calls lm-evaluation-harness as a subprocess for each condition, with
-both tasks requested in a single lm_eval call (this is more efficient
-than separate calls since the model only needs to be loaded once per
-condition).
+both tasks requested in a single lm_eval call
 
 Skips any condition whose results already exist, so it's safe to
 resubmit if the SLURM job times out partway through.
@@ -20,7 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from config import BASE_MODEL_ROOT, LORA_ROOT, FULL_FT_ROOT, EVAL_OUTPUT_ROOT
 
-# ---- Paths (edit config.py at the repo root, not here) ----
+# Collect paths from config.py 
 BASE_MODEL = str(BASE_MODEL_ROOT / "qwen7b")
 FULL_FT_MODEL = FULL_FT_ROOT / "qwen_full"
 OUTPUT_ROOT = EVAL_OUTPUT_ROOT / "qwen"
@@ -29,7 +27,7 @@ RANKS = [1, 4, 16, 64]
 PLACEMENTS = ["early", "middle", "late"]
 
 # IFEval = instruction-following compliance (rule-based scoring)
-# MMLU   = general knowledge / reasoning (multiple-choice, loglikelihood scoring)
+# MMLU = general knowledge / reasoning (multiple-choice, loglikelihood scoring)
 # Running both in one lm_eval call per condition so the model is loaded once.
 TASKS = "ifeval,mmlu"
 BATCH_SIZE = "auto"
@@ -37,10 +35,10 @@ SEED = "42"
 
 
 def run_eval(model_args: str, out_path: Path, tag: str):
-    print("==============================================")
+    print("-" * 30)
     print(f"Running IFEval for: {tag}")
     print(f"model_args: {model_args}")
-    print("==============================================")
+    print("-" * 30)
 
     if (out_path / "results.json").exists() or list(out_path.rglob("results*.json")):
         print(f"Results already exist at {out_path}, skipping. Delete to force re-run.")
@@ -70,15 +68,15 @@ def run_eval(model_args: str, out_path: Path, tag: str):
 def main():
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
-    # 1. Base model (no adapter) — reference point
+    # 1. Base model (no adapter); reference point
     run_eval(
         model_args=f"pretrained={BASE_MODEL},dtype=bfloat16",
         out_path=OUTPUT_ROOT / "base",
         tag="qwen7b_base (ifeval+mmlu)",
     )
 
-    # 2. Full fine-tune condition — standalone merged model, no peft= needed.
-    # Skipped gracefully if not yet trained, so this script stays runnable
+    # 2. Full fine-tune condition; standalone merged model, no peft= needed.
+    # Skipped if not yet trained, so this script stays runnable
     # before the full fine-tune checkpoint exists.
     if FULL_FT_MODEL.is_dir() and (FULL_FT_MODEL / "config.json").exists():
         run_eval(
