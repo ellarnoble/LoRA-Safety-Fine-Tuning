@@ -1,15 +1,7 @@
 #!/bin/bash
-# Submit generation jobs for all 42 conditions (3 models x [baseline, full,
-# 12 lora conditions]).
+# Submit generation jobs for all 42 conditions
 #
 # Usage: ./submit_all_generate.sh [--dry-run]
-#
-# Run this AFTER the corresponding fine-tuning jobs have finished (baseline
-# needs nothing, full/lora need their training job done first). If your
-# cluster supports job dependencies and you know the relevant job ID(s), you
-# can chain automatically instead, e.g.:
-#
-#   DEPEND=afterok:12345 ./submit_all_generate.sh
 
 set -euo pipefail
 cd "$(dirname "$0")"
