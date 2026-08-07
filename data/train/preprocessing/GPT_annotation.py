@@ -34,13 +34,8 @@ if OUTPUT_FILE.exists():
 # ----------------------------
 # CLIENT
 # ----------------------------
-# Reads your API key from the OPENAI_API_KEY environment variable rather
-# than hardcoding it here. This repo is public — a key committed directly
-# into a script would be scraped and revoked/abused within minutes.
-# Set it before running, e.g. in PowerShell:
-#   $env:OPENAI_API_KEY = "sk-..."
-# or on macOS/Linux:
-#   export OPENAI_API_KEY="sk-..."
+# Reads API key from the OPENAI_API_KEY environment variable rather than hardcoding it here. 
+
 api_key = os.environ.get("OPENAI_API_KEY")
 if not api_key:
     raise RuntimeError(
