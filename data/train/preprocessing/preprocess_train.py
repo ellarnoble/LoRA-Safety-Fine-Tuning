@@ -19,8 +19,7 @@ HH_file = str(DATA_ROOT / "hh_train.jsonl")
 BT_file = str(DATA_ROOT / "bt_train.jsonl")
 WG_file = str(DATA_ROOT / "wg_train.parquet")
 
-# Used for the leakage check below. Adjust in config.py if your test split
-# lives somewhere else.
+# Used for the test/train leakage check below
 TEST_file = DATA_ROOT / "test.jsonl"
 
 MIN_RESPONSE_LENGTH = 25
@@ -29,8 +28,6 @@ MIN_RESPONSE_LENGTH = 25
 PARAPHRASE_THRESHOLD = 0.95
 EMBED_BATCH_SIZE = 64
 
-# Single final output of this whole script. Your GPT annotation script runs
-# on this file afterwards to produce annotated_train.xlsx.
 OUTPUT_FILE = DATA_ROOT / "preprocessed.jsonl"
 
 # ----------------------------
@@ -118,7 +115,7 @@ HH_dataset = HH_dataset.filter(lambda x: len(x["response"].strip()) > MIN_RESPON
 
 print(f"HH dataset size: {len(HH_dataset)}", flush=True)
 # ----------------------------
-# LOAD BT DATASET
+# LOAD BEAVERTAILS DATASET
 # ----------------------------
 print("Loading Beavertails dataset...", flush=True)
 BT_dataset = load_dataset("json", data_files=BT_file, split="train")
@@ -141,9 +138,8 @@ BT_dataset = BT_dataset.map(format_bt, remove_columns=BT_dataset.column_names)
 BT_dataset = BT_dataset.filter(lambda x: len(x["response"].strip()) > MIN_RESPONSE_LENGTH)
 
 print(f"BeaverTails dataset size: {len(BT_dataset)}", flush=True)
-
 # ----------------------------
-# LOAD WILDGUARD DATASET
+# LOAD WILDGUARDMIX DATASET
 # ----------------------------
 print("Loading WildGuard dataset...", flush=True)
 WG_dataset = load_dataset("parquet", data_files=WG_file, split="train")
@@ -212,10 +208,6 @@ print(f"Training data size: {after}", flush=True)
 # ----------------------------
 # REMOVE NEAR-DUPLICATE / PARAPHRASED PROMPTS
 # ----------------------------
-# Note: this runs BEFORE GPT annotation, so there's no response_safety
-# label to filter on yet (that column gets added by your annotation
-# script downstream) — this only does the embedding-similarity dedup
-# from paraphrase_removal.py, not its safety filter.
 print("\nRemoving near-duplicate/paraphrased prompts...", flush=True)
 
 data = df.to_dict(orient="records")
