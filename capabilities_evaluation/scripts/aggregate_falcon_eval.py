@@ -2,8 +2,7 @@
 Aggregate IFEval + MMLU results across all Falcon-7B conditions into
 a single CSV.
 
-Run after falcon_eval.py completes:
-    python aggregate_falcon_eval.py
+Run after falcon_eval.py completes
 """
 
 import csv
