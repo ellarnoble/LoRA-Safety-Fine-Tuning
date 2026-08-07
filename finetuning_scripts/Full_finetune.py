@@ -1,10 +1,6 @@
 """
 Full-parameter fine-tuning, parametrised by model.
 
-Replaces Mistral_Full_FineTune.py, Qwen_Full_FineTune.py, Falcon_Full_Finetune.py,
-which were three identical copies of this script differing only in model_id /
-output_dir.
-
 Usage
 -----
     python full_finetune.py --model mistral7b
