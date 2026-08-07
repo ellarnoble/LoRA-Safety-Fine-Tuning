@@ -1,11 +1,6 @@
 """
 LoRA fine-tuning, parametrised by model / rank / adapter placement.
 
-Replaces Mistral_LoRA.py, Qwen_LoRA.py, Falcon_LoRA.py, which were three
-near-identical copies of this script that had to be hand-edited per run
-(swap model_id, output_dir, and layers_to_transform for every one of the
-12 LoRA conditions per model).
-
 Usage
 -----
     python lora_finetune.py --model mistral7b --rank 4 --placement early
@@ -14,8 +9,7 @@ Usage
         --data_file /scratch/me/data/cleaned/train.jsonl
 
 Layer ranges for each (model, placement) pair are looked up automatically
-from config.MODEL_REGISTRY (Table~\\ref{tab:model-layer-placements} in the
-dissertation) -- nothing here needs to be hand-edited to switch conditions.
+from config.MODEL_REGISTRY
 """
 
 import argparse
