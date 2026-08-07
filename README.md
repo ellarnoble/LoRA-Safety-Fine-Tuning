@@ -11,10 +11,10 @@ config.py
 requirements.txt
 data/                            
   test/
-      test.jsonl
+    test.jsonl
   train/
-      annotated_train.xlsx
-      train.jsonl
+    annotated_train.xlsx
+    train.jsonl
 preprocessing/
   preprocess_train.py
   GPT_annotation.py               
