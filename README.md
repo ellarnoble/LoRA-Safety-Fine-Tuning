@@ -1,5 +1,7 @@
 # LoRA-Safety-Fine-Tuning
 
+## Overview
+
 Master's dissertation project evaluating how LoRA rank and adapter placement affect
 safety alignment outcomes and general capabilities (IFEval, MMLU) across
 Falcon-7B, Mistral-7B, and Qwen-7B.
