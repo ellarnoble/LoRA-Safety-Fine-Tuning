@@ -2,17 +2,12 @@
 Generate model responses on the held-out test set, parametrised by model and
 condition (baseline / full fine-tune / a specific LoRA rank+placement).
 
-Replaces Mistral_Generate.py, Qwen_Generate.py, Falcon_Generate.py, which had
-to be hand-edited (model_dir, output_file) for every one of the 14 conditions
-per model.
-
 Mistral and Qwen are generated through transformers' `pipeline("text-generation")`.
 Falcon is generated through a direct `model.generate()` call instead, because its
 <|user|>/<|assistant|>/<|system|> turn markers are plain text tokens (not special
 tokens), so they survive `skip_special_tokens=True` and have to be truncated out
 manually (see config.truncate_at_turn_marker). This script picks the right code
-path automatically from config.MODEL_REGISTRY[model].generation_mode -- you don't
-need to remember which model needs which treatment.
+path automatically from config.MODEL_REGISTRY[model].generation_mode
 
 Usage
 -----
