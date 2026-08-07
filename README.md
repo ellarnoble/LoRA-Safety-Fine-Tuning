@@ -1,7 +1,7 @@
 # LoRA-Safety-Fine-Tuning
 
-Dissertation project evaluating how LoRA rank and adapter placement affect
-safety-tuning outcomes and general capabilities (IFEval, MMLU) across
+Master's dissertation project evaluating how LoRA rank and adapter placement affect
+safety alignment outcomes and general capabilities (IFEval, MMLU) across
 Falcon-7B, Mistral-7B, and Qwen-7B.
 
 ## Repo layout
@@ -10,11 +10,14 @@ Falcon-7B, Mistral-7B, and Qwen-7B.
 config.py                       
 requirements.txt
 data/                            
-  test/test.jsonl
-  train/annotated_train.xlsx
-  train/train.jsonl
+  test/
+      test.jsonl
+  train/
+      annotated_train.xlsx
+      train.jsonl
 preprocessing/
-  preprocess_train.py               
+  preprocess_train.py
+  GPT_annotation.py               
 capabilities_evaluation/
   scripts/
     predownload_evaltasks.py      
