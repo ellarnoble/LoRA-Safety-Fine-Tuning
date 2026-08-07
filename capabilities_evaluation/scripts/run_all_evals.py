@@ -1,22 +1,17 @@
 """
-Orchestrates the full Capabilities Evaluation pipeline for one or more
-model families (Falcon-7B, Mistral-7B, Qwen-7B) with a single command,
-instead of running six-plus scripts by hand in the right order.
+Orchestrates the full Capabilities Evaluation pipeline for all
+model families (Falcon-7B, Mistral-7B, Qwen-7B)
 
-This is a thin wrapper around the existing scripts in this folder
+This is the wrapper around the existing scripts in this folder
 (falcon_eval.py, mistral_eval.py, qwen_eval.py and their aggregate_*
-counterparts) — it does not change what any of them do. It just:
+counterparts)
 
   - runs each model's eval step, then its aggregate step, in order
-  - times every stage and prints clear section headers
   - if one model's eval step fails, keeps going with the remaining
-    models instead of aborting the whole run (each per-model script
-    already skips conditions whose results exist, so re-running after
-    a partial failure is cheap)
-  - merges the three per-model summary CSVs into one combined CSV with
-    a "model" column, so you don't have to open three files
+    models instead of aborting the whole run 
+  - merges the three per-model summary CSVs into one combined CSV 
   - prints a final OK/FAILED table per model/stage and exits non-zero
-    if anything failed, so it plays nicely in a SLURM job script
+    if anything failed
 
 Usage:
     # Run everything: all three models, eval + aggregate, then merge
@@ -32,9 +27,7 @@ Usage:
     # Only run the eval step, skip aggregation/merge
     python run_all_evals.py --eval-only
 
-    # Also run predownload_evaltasks.py first. Only useful on the CSF3
-    # LOGIN node before submitting the GPU job — see that script's
-    # docstring; compute nodes can't reach HuggingFace Hub.
+    # Also run predownload_evaltasks.py first
     python run_all_evals.py --predownload
 """
 
@@ -148,7 +141,7 @@ def main():
             print("Predownload reported a failure — continuing anyway, but eval runs may fail "
                   "if the datasets aren't already cached.")
 
-    results = {}  # model -> {"eval": bool|None, "aggregate": bool|None}
+    results = {} 
 
     for model in args.models:
         results[model] = {"eval": None, "aggregate": None}
@@ -165,11 +158,11 @@ def main():
             results[model]["aggregate"] = ok
 
     if not args.eval_only:
-        print(f"\n{'=' * 60}\nMerging per-model summaries\n{'=' * 60}")
+        print(f"\n{'-' * 30}\nMerging per-model summaries\n{'-' * 30}")
         merge_csvs(args.models)
 
     elapsed = time.time() - overall_start
-    print(f"\n{'=' * 60}\nPipeline finished in {elapsed / 60:.1f} min\n{'=' * 60}")
+    print(f"\n{'-' * 30}\nPipeline finished in {elapsed / 60:.1f} min\n{'-' * 30}")
     for model, stages in results.items():
         parts = [f"{stage}={'OK' if ok else 'FAILED'}" for stage, ok in stages.items() if ok is not None]
         print(f"  {model}: {', '.join(parts) if parts else '(skipped)'}")
