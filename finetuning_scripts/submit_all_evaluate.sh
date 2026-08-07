@@ -6,7 +6,6 @@
 # Run this AFTER the corresponding generate.py jobs have written their
 # *_responses.jsonl files. Input/output/debug paths are derived from
 # config.py (config.generate_output_file / config.safety_eval_paths) --
-# nothing to configure here beyond editing config.py itself.
 
 set -euo pipefail
 cd "$(dirname "$0")"
