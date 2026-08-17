@@ -9,12 +9,14 @@
 
 echo "Job started on $(hostname)"
 
-# Edit this to your own venv path
-source /path_to_venv/venv/bin/activate
-
 # cd to this script's own directory (attribution_analysis/) so it works
 # regardless of where sbatch was invoked from.
 cd "$(dirname "$0")"
+
+# Activate the venv named by config.VENV_PATH
+REPO_ROOT="$(cd .. && pwd)"
+VENV_PATH=$(PYTHONPATH="$REPO_ROOT" python3 -c "import config; print(config.VENV_PATH)")
+source "$VENV_PATH/bin/activate"
 
 CUDA_VISIBLE_DEVICES=0 python owen_shapley_attribution.py r64_middle > shapley_r64_middle.log 2>&1 &
 PID1=$!
