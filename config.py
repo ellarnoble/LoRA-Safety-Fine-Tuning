@@ -270,3 +270,32 @@ def parse_hct(text: str):
         hct = None
         response_text = text
     return hct, response_text
+
+
+# ----------------------------------------------------------------------------
+# ATTRIBUTION ANALYSIS (Owen-Shapley word-importance scores)
+# ----------------------------------------------------------------------------
+# Per-word Shapley importance scores for a model's harm-classification-token
+# (hct) prediction, computed over a hand-selected subset of 100 prompts per
+# condition. See attribution_analysis/owen_shapley_attribution.py.
+
+# Directory holding the "<model>_<label>_100_selected.jsonl" prompt subsets
+# used as input to the Shapley attribution runs, one file per condition,
+# e.g. ATTRIBUTION_PROMPTS_ROOT / "mistral7b_r64_middle_100_selected.jsonl".
+ATTRIBUTION_PROMPTS_ROOT = DATA_ROOT / "attribution_prompts"
+
+# Root directory for Shapley attribution results, one subfolder per
+# condition, e.g. ATTRIBUTION_ROOT / "mistral7b_r64_middle_shapley".
+ATTRIBUTION_ROOT = Path(f"/scratch/{USERNAME}/attribution_results")
+
+
+def attribution_prompts_file(model: str, condition: str, rank: int = None, placement: str = None) -> Path:
+    """Path to the '<model>_<label>_100_selected.jsonl' input prompts file for a condition."""
+    label = condition_label(condition, rank, placement)
+    return ATTRIBUTION_PROMPTS_ROOT / f"{model}_{label}_100_selected.jsonl"
+
+
+def attribution_output_dir(model: str, condition: str, rank: int = None, placement: str = None) -> Path:
+    """Output directory Shapley CSV results are written to for a condition."""
+    label = condition_label(condition, rank, placement)
+    return ATTRIBUTION_ROOT / f"{model}_{label}_shapley"
