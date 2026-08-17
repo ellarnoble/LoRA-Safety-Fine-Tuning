@@ -9,9 +9,8 @@
 
 echo "Job started on $(hostname)"
 
-# Edit this to your own venv path (this can't be read from config.py, since
-# that's only importable once Python + the venv are already active).
-source /scratch/f42827en/diss_env/bin/activate
+# Edit this to your own venv path
+source /path_to_venv/venv/bin/activate
 
 # cd to this script's own directory (attribution_analysis/) so it works
 # regardless of where sbatch was invoked from.
