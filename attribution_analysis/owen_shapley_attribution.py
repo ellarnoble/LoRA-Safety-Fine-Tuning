@@ -13,16 +13,12 @@ Usage
     python owen_shapley_attribution.py r64_middle
     python owen_shapley_attribution.py full
     python owen_shapley_attribution.py r1_late
-
-Conditions below are for mistral7b only, matching the three checkpoints this
-analysis was run against. Add entries to CONDITIONS to cover more.
 """
 
 import sys
 from pathlib import Path
 
-# Make config.py (at the repo root) importable regardless of where this
-# script is run from.
+# Make config.py (at the repo root) importable regardless of where this script is run from.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from config import (
     attribution_output_dir,
@@ -70,15 +66,14 @@ CONDITIONS = {
 if len(sys.argv) != 2 or sys.argv[1] not in CONDITIONS:
     sys.exit(f"Usage: python {Path(__file__).name} <{'|'.join(CONDITIONS)}>")
 
+# Extract the condition name from the command-line argument and look up the matching entry in the CONDITIONS dictionary
 CONDITION = sys.argv[1]
 cfg = CONDITIONS[CONDITION]
 model_dir = str(cfg["model_dir"])
 output_dir = cfg["output_dir"]
 output_dir.mkdir(parents=True, exist_ok=True)
 
-# ----------------------------------------------------------------------------
-# Load model
-# ----------------------------------------------------------------------------
+# Load model (same logic as response generation script)
 tokenizer = AutoTokenizer.from_pretrained(model_dir, padding_side="left")
 generator = pipeline(
     "text-generation",
@@ -90,10 +85,12 @@ generator = pipeline(
 if generator.tokenizer.pad_token_id is None:
     generator.tokenizer.pad_token_id = generator.model.config.eos_token_id
 
+# Look up token IDs for hct labels
 TOKEN_ID_0 = tokenizer.encode("0", add_special_tokens=False)[-1]
 TOKEN_ID_1 = tokenizer.encode("1", add_special_tokens=False)[-1]
 
-
+# Run a single forwards pass through the model on current input and pull out raw logits 
+# at last token (prediction for hct label)
 def hct_probability(prompt_text):
     formatted = format_prompt(prompt_text, tokenizer)
     inputs = tokenizer(formatted, return_tensors="pt").to(generator.model.device)
@@ -102,7 +99,8 @@ def hct_probability(prompt_text):
     probs = torch.softmax(logits[[TOKEN_ID_0, TOKEN_ID_1]], dim=-1)
     return probs[1].item()
 
-
+# subclasses pyDVL's 'UtilityBase': rebuilds the current words in their original order since pyDVL subsets are unordered
+# then returns hct_prob_fn's P(unsafe) for that partial prompt using hct_probability function 
 class HCTTokenUtility(UtilityBase):
     def __init__(self, words, hct_prob_fn):
         self.words = words
@@ -116,7 +114,7 @@ class HCTTokenUtility(UtilityBase):
             present_words = [self.words[i] for i in sorted(sample.subset)]
         return self.hct_prob_fn(" ".join(present_words))
 
-
+# Estimate a Shapley 'importance' value for each word in the prompt
 def compute_shapley_importance(
     prompt_text,
     hct_prob_fn=hct_probability,
@@ -127,19 +125,28 @@ def compute_shapley_importance(
 ):
     words = prompt_text.split()
     n = len(words)
+
+    # x_dummy/y_dummy are placeholder feature/target arrays required by pyDVL's Dataset API
     x_dummy = np.arange(n).reshape(-1, 1)
     y_dummy = np.zeros(n)
     unique_names = [f"{w}_{i}" for i, w in enumerate(words)]
     dataset = Dataset(x_dummy, y_dummy, data_names=unique_names)
+
+    # Use antithetic variant of owen sampler
     utility = HCTTokenUtility(words, hct_prob_fn)
     sampler = AntitheticOwenSampler(
+        # Use fixed even-spaced grid of probs to avoid checking all 2^n subsets
         outer_sampling_strategy=GridOwenStrategy(n_samples_outer=n_samples_outer),
         n_samples_inner=n_samples_inner,
     )
+    
+    # Keeps sampling until the ranking of words by importance stops changing much between checks
     stopping = RankCorrelation(rtol=rtol, burn_in=burn_in)
     valuation = ShapleyValuation(utility, sampler, stopping)
     valuation.fit(dataset)
     result = valuation.result
+
+    # Returns a df of words sorted by Shapley value, most unsafe-pushing first
     return pd.DataFrame(
         {
             "word": [words[i] for i in result.indices],
@@ -151,9 +158,8 @@ def compute_shapley_importance(
     ).sort_values("shapley_value", ascending=False).reset_index(drop=True)
 
 
-# ----------------------------------------------------------------------------
+
 # Run
-# ----------------------------------------------------------------------------
 with open(cfg["prompts_file"], encoding="utf-8") as f:
     EXAMPLES = [json.loads(line) for line in f]
 print(f"Loaded {len(EXAMPLES)} prompts from {cfg['prompts_file']}", flush=True)
