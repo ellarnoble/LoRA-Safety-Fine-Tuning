@@ -2,13 +2,7 @@
 Aggregate IFEval + MMLU results across all Mistral-7B conditions into
 a single CSV.
 
-Run after mistral_eval.py completes:
-    python aggregate_mistral_eval.py
-
-Expects the directory structure produced by lm-evaluation-harness under
---output_path, i.e. each condition folder containing a results.json
-(lm-eval nests it under a model-name subfolder by default — this script
-searches recursively for results*.json to handle that).
+Run after mistral_eval.py completes
 """
 
 import csv
@@ -32,9 +26,6 @@ IFEVAL_METRICS = [
     "inst_level_loose_acc,none",
 ]
 
-# MMLU: lm-eval reports an overall "acc,none" under the mmlu group,
-# plus per-subject scores under mmlu_<subject>. We pull the overall here;
-# per-subject breakdowns are in the raw results.json if needed later.
 MMLU_METRIC = "acc,none"
 
 

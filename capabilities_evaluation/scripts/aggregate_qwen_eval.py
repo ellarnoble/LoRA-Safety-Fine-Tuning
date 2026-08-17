@@ -2,8 +2,7 @@
 Aggregate IFEval + MMLU results across all Qwen-7B conditions into
 a single CSV.
 
-Run after qwen_eval.py completes:
-    python aggregate_qwen_eval.py
+Run after qwen_eval.py completes
 """
 
 import csv

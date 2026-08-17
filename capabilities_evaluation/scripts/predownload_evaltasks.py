@@ -1,12 +1,8 @@
 """
-Pre-download IFEval and MMLU datasets/configs into the local HF cache.
+Pre-download IFEval and MMLU datasets/configs into the local HF cache
 
-Run this ONCE on the CSF3 LOGIN NODE (which has internet access),
-before submitting the GPU job, compute nodes are network-isolated
-and cannot reach HuggingFace Hub directly.
+Run this ONCE (with internet access) before submitting the GPU job
 
-Usage:
-    python predownload_eval_data.py
 """
 
 from lm_eval.tasks import TaskManager

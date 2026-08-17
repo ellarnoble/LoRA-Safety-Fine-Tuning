@@ -1,18 +1,10 @@
-# Core data handling
 pandas
 numpy
-openpyxl          # required by pandas to read/write .xlsx (annotated_train.xlsx)
-
-# Preprocessing (preprocessing/preprocess_train.py)
-datasets           # HuggingFace datasets, for loading pku/hh/beavertails/wildguard
+openpyxl
+datasets
 sentence-transformers
-faiss-cpu          # swap for faiss-gpu if you have a CUDA build available
+faiss-gpu
 tqdm
-
-# Capabilities evaluation (capabilities_evaluation/scripts/*)
-# lm-eval pulls in its own torch/transformers pins, but on a GPU cluster you
-# should install torch FIRST, matching your cluster's CUDA version, before
-# installing the rest of this file — see the README for details.
 lm-eval
 torch
 transformers
