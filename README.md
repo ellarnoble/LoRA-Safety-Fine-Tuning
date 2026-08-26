@@ -8,7 +8,7 @@ Models are evaluated on their ability to produce safe responses and accurate har
 
 ## Setup
 
-Clone the repo and create a virtual environment:
+Clone the repo and create a virtual environment, requires Python 3.12:
 
 ```
 git clone https://github.com/ellarnoble/LoRA-Safety-Fine-Tuning.git
@@ -25,6 +25,8 @@ pip install -r requirements.txt
 ```
 
 Then open `config.py` at the repo root and set `USERNAME` (and any of the `*_ROOT` paths, if your directory layout differs from the CSF3 scratch structure this project was built on) to match your own account. Every script in this repo imports its paths from `config.py`, it's the only file you should need to edit to get things running on your own machine or cluster account.
+
+The statistical analysis scripts under `safety_analysis/scripts/` require R with the following packages installed: `tidyverse`, `dplyr`, `tidyr`, `stringr`, `lme4`, `blme`, `nnet`, `car`, `emmeans`, `effectsize`, `performance`, `broom`, `ggeffects`, `ggplot2`, `ggh4x`, `ggrepel`, `scales`, `readxl`, `jsonlite`, `knitr`.
 
 ## Pipeline
 
