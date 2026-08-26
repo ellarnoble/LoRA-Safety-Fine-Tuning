@@ -8,3 +8,8 @@ tqdm
 lm-eval
 torch
 transformers
+peft
+trl
+openai
+pydvl
+matplotlib
