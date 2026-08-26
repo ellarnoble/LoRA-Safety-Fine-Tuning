@@ -11,7 +11,7 @@ RAW_FULL = '''
   number         5         0.0917    0.0469        256
 security         4         0.0512    0.0312        256
   ...
-'''  # paste straight from the R console, headers/separator lines are ignored; these are from log.txt results files 
+'''  # paste straight from the R console, headers/separator lines are ignored; these are from .log results files 
 
 conditions = [
     {"title": "Full fine-tuning", "hct": 0, "words": parse_shapley_block(RAW_FULL)},
