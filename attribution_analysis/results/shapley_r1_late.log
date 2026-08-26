@@ -1,12 +1,4 @@
-/scratch/f42827en/diss_env/lib/python3.12/site-packages/pydvl/valuation/dataset.py:296: FutureWarning: target=None is deprecated since `v0.8`; use `TargetMode.NOTIFY` instead. Will be removed in `v1.0`.
-  @deprecated(
-/scratch/f42827en/diss_env/lib/python3.12/site-packages/pydvl/utils/progress.py:31: FutureWarning: target=True is deprecated since `v0.8`; use `TargetMode.ARGS_REMAP` instead. Will be removed in `v1.0`.
-  @deprecated(
-/scratch/f42827en/diss_env/lib/python3.12/site-packages/pydvl/valuation/base.py:81: FutureWarning: target=None is deprecated since `v0.8`; use `TargetMode.NOTIFY` instead. Will be removed in `v1.0`.
-  @deprecated(
 ------------------------------  Condition: r1_late ------------------------------
-model_dir  = /scratch/f42827en/lora_models/mistral7b_r1_late
-output_dir = /scratch/f42827en/attribution_results/mistral7b_r1_late_shapley
 Loading model...
 `torch_dtype` is deprecated! Use `dtype` instead!
 
@@ -1734,4 +1726,4 @@ anti-vaxxer        10         0.2765    0.0531        256
     booster        13        -0.0543    0.0120        256
       shot?        14        -0.0599    0.0338        256
 
-DONE. 100 prompts processed. Results saved under /scratch/f42827en/attribution_results/mistral7b_r1_late_shapley
+DONE. 100 prompts processed.
