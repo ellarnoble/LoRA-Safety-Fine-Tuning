@@ -1,16 +1,41 @@
-/scratch/f42827en/diss_env/lib/python3.12/site-packages/pydvl/valuation/dataset.py:296: FutureWarning: target=None is deprecated since `v0.8`; use `TargetMode.NOTIFY` instead. Will be removed in `v1.0`.
-  @deprecated(
-/scratch/f42827en/diss_env/lib/python3.12/site-packages/pydvl/utils/progress.py:31: FutureWarning: target=True is deprecated since `v0.8`; use `TargetMode.ARGS_REMAP` instead. Will be removed in `v1.0`.
-  @deprecated(
-/scratch/f42827en/diss_env/lib/python3.12/site-packages/pydvl/valuation/base.py:81: FutureWarning: target=None is deprecated since `v0.8`; use `TargetMode.NOTIFY` instead. Will be removed in `v1.0`.
-  @deprecated(
 ------------------------------  Condition: r64_middle ------------------------------
-model_dir  = /scratch/f42827en/lora_models/mistral7b_r64_middle
-output_dir = /scratch/f42827en/attribution_results/mistral7b_r64_middle_shapley
 Loading model...
 `torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights:   0%|          | 1/291 [00:00<01:05,  4.41it/s]Loading weights:   1%|▏         | 4/291 [00:00<00:20, 14.25it/s]Loading weights:   5%|▌         | 16/291 [00:00<00:06, 44.79it/s]Loading weights:   9%|▉         | 27/291 [00:00<00:04, 60.35it/s]Loading weights:  12%|█▏        | 34/291 [00:00<00:04, 53.44it/s]Loading weights:  16%|█▌        | 47/291 [00:00<00:04, 59.19it/s]Loading weights:  20%|█▉        | 58/291 [00:01<00:03, 62.71it/s]Loading weights:  22%|██▏       | 65/291 [00:01<00:03, 57.76it/s]Loading weights:  24%|██▍       | 71/291 [00:01<00:04, 47.96it/s]Loading weights:  27%|██▋       | 79/291 [00:01<00:05, 37.61it/s]Loading weights:  30%|███       | 88/291 [00:01<00:05, 40.33it/s]Loading weights:  32%|███▏      | 93/291 [00:02<00:05, 36.99it/s]Loading weights:  38%|███▊      | 112/291 [00:02<00:02, 62.87it/s]Loading weights:  41%|████      | 120/291 [00:02<00:03, 55.10it/s]Loading weights:  44%|████▍     | 128/291 [00:02<00:02, 54.38it/s]Loading weights:  50%|█████     | 146/291 [00:02<00:01, 74.19it/s]Loading weights:  56%|█████▌    | 162/291 [00:02<00:01, 89.41it/s]Loading weights:  59%|█████▉    | 173/291 [00:02<00:01, 88.98it/s]Loading weights:  63%|██████▎   | 183/291 [00:03<00:01, 74.72it/s]Loading weights:  69%|██████▉   | 202/291 [00:03<00:00, 96.11it/s]Loading weights:  75%|███████▍  | 218/291 [00:03<00:00, 108.17it/s]Loading weights:  79%|███████▉  | 230/291 [00:03<00:00, 71.71it/s] Loading weights:  82%|████████▏ | 240/291 [00:03<00:00, 75.45it/s]Loading weights:  90%|█████████ | 262/291 [00:03<00:00, 97.49it/s]Loading weights:  94%|█████████▍| 274/291 [00:04<00:00, 102.20it/s]Loading weights:  98%|█████████▊| 286/291 [00:04<00:00, 105.56it/s]Loading weights: 100%|██████████| 291/291 [00:04<00:00, 69.56it/s] 
-Loading weights:   0%|          | 0/40 [00:00<?, ?it/s]Loading weights:  15%|█▌        | 6/40 [00:00<00:00, 52.47it/s]Loading weights:  30%|███       | 12/40 [00:00<00:00, 46.13it/s]Loading weights:  65%|██████▌   | 26/40 [00:00<00:00, 80.08it/s]Loading weights: 100%|██████████| 40/40 [00:00<00:00, 97.54it/s]
+
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/291 [00:00<01:05,  4.41it/s]
+Loading weights:   1%|▏         | 4/291 [00:00<00:20, 14.25it/s]
+Loading weights:   5%|▌         | 16/291 [00:00<00:06, 44.79it/s]
+Loading weights:   9%|▉         | 27/291 [00:00<00:04, 60.35it/s]
+Loading weights:  12%|█▏        | 34/291 [00:00<00:04, 53.44it/s]
+Loading weights:  16%|█▌        | 47/291 [00:00<00:04, 59.19it/s]
+Loading weights:  20%|█▉        | 58/291 [00:01<00:03, 62.71it/s]
+Loading weights:  22%|██▏       | 65/291 [00:01<00:03, 57.76it/s]
+Loading weights:  24%|██▍       | 71/291 [00:01<00:04, 47.96it/s]
+Loading weights:  27%|██▋       | 79/291 [00:01<00:05, 37.61it/s]
+Loading weights:  30%|███       | 88/291 [00:01<00:05, 40.33it/s]
+Loading weights:  32%|███▏      | 93/291 [00:02<00:05, 36.99it/s]
+Loading weights:  38%|███▊      | 112/291 [00:02<00:02, 62.87it/s]
+Loading weights:  41%|████      | 120/291 [00:02<00:03, 55.10it/s]
+Loading weights:  44%|████▍     | 128/291 [00:02<00:02, 54.38it/s]
+Loading weights:  50%|█████     | 146/291 [00:02<00:01, 74.19it/s]
+Loading weights:  56%|█████▌    | 162/291 [00:02<00:01, 89.41it/s]
+Loading weights:  59%|█████▉    | 173/291 [00:02<00:01, 88.98it/s]
+Loading weights:  63%|██████▎   | 183/291 [00:03<00:01, 74.72it/s]
+Loading weights:  69%|██████▉   | 202/291 [00:03<00:00, 96.11it/s]
+Loading weights:  75%|███████▍  | 218/291 [00:03<00:00, 108.17it/s]
+Loading weights:  79%|███████▉  | 230/291 [00:03<00:00, 71.71it/s] 
+Loading weights:  82%|████████▏ | 240/291 [00:03<00:00, 75.45it/s]
+Loading weights:  90%|█████████ | 262/291 [00:03<00:00, 97.49it/s]
+Loading weights:  94%|█████████▍| 274/291 [00:04<00:00, 102.20it/s]
+Loading weights:  98%|█████████▊| 286/291 [00:04<00:00, 105.56it/s]
+Loading weights: 100%|██████████| 291/291 [00:04<00:00, 69.56it/s] 
+
+Loading weights:   0%|          | 0/40 [00:00<?, ?it/s]
+Loading weights:  15%|█▌        | 6/40 [00:00<00:00, 52.47it/s]
+Loading weights:  30%|███       | 12/40 [00:00<00:00, 46.13it/s]
+Loading weights:  65%|██████▌   | 26/40 [00:00<00:00, 80.08it/s]
+Loading weights: 100%|██████████| 40/40 [00:00<00:00, 97.54it/s]
 Loaded 100 prompts from mistral7b_r64_middle_100_selected.jsonl
 
 ------------------------------
@@ -1705,4 +1730,4 @@ anti-vaxxer        10         0.2392    0.0247        256
   regarding        11        -0.0202    0.0031        256
     booster        13        -0.0516    0.0081        256
 
-DONE. 100 prompts processed. Results saved under /scratch/f42827en/attribution_results/mistral7b_r64_middle_shapley
+DONE. 100 prompts processed.
