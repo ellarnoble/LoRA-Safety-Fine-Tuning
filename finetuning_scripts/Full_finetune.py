@@ -89,7 +89,7 @@ def main():
     # ----------------------------
     # TRAINING CONFIG
     # ----------------------------
-    config = SFTConfig(
+    sft_config = SFTConfig(
         output_dir=output_dir,
         per_device_train_batch_size=args.per_device_train_batch_size,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
@@ -112,7 +112,7 @@ def main():
     trainer = SFTTrainer(
         model=model,
         train_dataset=dataset,
-        args=config,
+        args=sft_config,
     )
 
     # ----------------------------
