@@ -2,9 +2,9 @@
 
 ## Overview
 
-Master's dissertation project evaluating how LoRA rank and adapter placement affect safety alignment outcomes and general capabilities (IFEval, MMLU) across Falcon-7B, Mistral-7B, and Qwen-7B Instruct models.
+Master's dissertation project evaluating how LoRA rank and adapter placement affect safety alignment outcomes and general capabilities (IFEval, MMLU) across Falcon-7B, Mistral-7B, and Qwen-7B Instruct models. 
 
-Models are evaluated on their ability to produce safe responses and accurate harm classifications in response to the evaluation prompts, whilst retaining their general capabilities. Additional attribution analysis is conducted on three selected Mistral-7B models by estimating word-level Shapley values across a sample of evaluation prompts to assess which words most contributed towards the models' harm classifications. 
+12 LoRA fine-tuning configurations (4 ranks x 3 adapter placements) are compared to both a fully fine-tuned model and their corresponding base model. All models are evaluated on their ability to produce safe responses and accurate harm classifications in response to the evaluation prompts, whilst retaining their general capabilities. Additional attribution analysis is conducted on three selected Mistral-7B models by estimating word-level Shapley values across a sample of evaluation prompts to assess which words most contributed towards the models' harm classifications. 
 
 ## Setup
 
