@@ -44,4 +44,4 @@ The statistical analysis scripts under `safety_analysis/scripts/` require R with
 
 7. **Attribution analysis.** `attribution_analysis/scripts/owen_shapley_attribution.py <condition>` computes word-level Shapley attributions for the harm-classification decision on the three selected Mistral-7B conditions; `plot_attributions.py` renders the comparison figures.
 
-8. **Statistical analysis.** The R scripts in `safety_analysis/scripts/` take the aggregated safety and capabilities results and produce the omnibus tests and plots reported in the dissertation.
+8. **Statistical analysis.** The R scripts in `safety_analysis/scripts/` take the aggregated safety and capabilities results and produce the linear models, pairwise tests and plots reported in the dissertation.
