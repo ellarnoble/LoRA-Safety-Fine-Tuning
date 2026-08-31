@@ -212,11 +212,3 @@ p_srr <- p_srr +
   )
 p_hct
 p_srr
-
-ggsave("srr-utility-tradeoff.png", plot = p_srr,
-       path = "C:/Users/Ella/OneDrive/Documents/Ella/UniMsc/DISSERTATION/Final/Write-up",
-       width = 8, height = 3.5, dpi = 300, bg = "white")
-
-ggsave("hct-utility-tradeoff.png", plot = p_hct,
-       path = "C:/Users/Ella/OneDrive/Documents/Ella/UniMsc/DISSERTATION/Final/Write-up",
-       width = 8, height = 3.5, dpi = 300, bg = "white")
