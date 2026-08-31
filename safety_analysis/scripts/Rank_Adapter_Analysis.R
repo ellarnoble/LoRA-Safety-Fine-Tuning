@@ -440,3 +440,172 @@ hct_fpr <- prepared %>%
   mutate(fpr = round(fpr, 3))
 
 print(hct_fpr, n = Inf)
+
+# ---------------------------------------------------------------------------
+# (10) Pairwise post-hoc comparison tests across adapter placement conditions 
+# ---------------------------------------------------------------------------
+benchmark_data <- prepared %>%
+  mutate(
+    benchmark    = dplyr::recode(source, wildguard = "WildGuard", beavertails = "BeaverTails"),
+    prompt_type  = ifelse(G == 1, "Unsafe", "Safe"),
+    placement    = str_extract(condition, "early|middle|late"),
+    rank         = str_extract(condition, "r[0-9]+"),
+    safe_response = as.logical(R_safe)
+  )
+
+ranks      <- c("r1", "r4", "r16", "r64")
+placements <- c("early", "middle", "late")
+
+# -----------------------------------------------------------------------
+# (10a) Late vs. early/middle placement, SRR — both benchmarks
+# -----------------------------------------------------------------------
+placement_pairwise_results <- list()
+for (bench in c("WildGuard", "BeaverTails")) {
+  for (pt in c("Unsafe", "Safe")) {
+    for (bm in basemodel_order) {
+      for (rk in ranks) {
+        cond_data <- list(
+          early  = benchmark_data %>% filter(benchmark == bench, prompt_type == pt, basemodel == bm, rank == rk, placement == "early"),
+          middle = benchmark_data %>% filter(benchmark == bench, prompt_type == pt, basemodel == bm, rank == rk, placement == "middle"),
+          late   = benchmark_data %>% filter(benchmark == bench, prompt_type == pt, basemodel == bm, rank == rk, placement == "late")
+        )
+        for (comp in c("early", "middle")) {
+          merged <- inner_join(
+            cond_data$late %>% select(index, safe_late = safe_response),
+            cond_data[[comp]] %>% select(index, safe_comp = safe_response),
+            by = "index"
+          )
+          tab  <- table(late = merged$safe_late, comp = merged$safe_comp)
+          test <- mcnemar.test(tab, correct = TRUE)
+          placement_pairwise_results[[length(placement_pairwise_results) + 1]] <- tibble(
+            benchmark = bench, prompt_type = pt, basemodel = bm, rank = rk,
+            comparison = paste0("late_vs_", comp),
+            srr_late = mean(merged$safe_late) * 100,
+            srr_comp = mean(merged$safe_comp) * 100,
+            diff = mean(merged$safe_late) * 100 - mean(merged$safe_comp) * 100,
+            p_raw = test$p.value
+          )
+        }
+      }
+    }
+  }
+}
+placement_pairwise_df <- bind_rows(placement_pairwise_results) %>%
+  mutate(
+    p_holm = p.adjust(p_raw, method = "holm"),
+    sig = p_holm < 0.05,
+    late_larger = diff > 0
+  )
+for (bench in c("WildGuard", "BeaverTails")) {
+  for (pt in c("Unsafe", "Safe")) {
+    sub <- placement_pairwise_df %>% filter(benchmark == bench, prompt_type == pt)
+    cat(sprintf("[%s, %s] %d/24 comparisons favour late placement; %d/24 significant\n",
+                bench, pt, sum(sub$late_larger), sum(sub$sig & sub$late_larger)))
+  }
+}
+
+# -----------------------------------------------------------------------
+# (10b) Placement conditions vs. baseline, SRR — all base models & benchmarks
+# -----------------------------------------------------------------------
+baseline_pairwise_results <- list()
+for (bench in c("WildGuard", "BeaverTails")) {
+  for (pt in c("Unsafe", "Safe")) {
+    for (bm in basemodel_order) {
+      baseline_data <- benchmark_data %>%
+        filter(benchmark == bench, prompt_type == pt, basemodel == bm, condition == "baseline")
+      for (pl in placements) {
+        for (rk in ranks) {
+          cond <- paste0(rk, "_", pl)
+          cond_data <- benchmark_data %>%
+            filter(benchmark == bench, prompt_type == pt, basemodel == bm, condition == cond)
+          merged <- inner_join(
+            baseline_data %>% select(index, safe_base = safe_response),
+            cond_data %>% select(index, safe_cond = safe_response),
+            by = "index"
+          )
+          tab  <- table(base = merged$safe_base, cond = merged$safe_cond)
+          test <- mcnemar.test(tab, correct = TRUE)
+          baseline_pairwise_results[[length(baseline_pairwise_results) + 1]] <- tibble(
+            benchmark = bench, prompt_type = pt, basemodel = bm,
+            placement = pl, rank = rk, condition = cond,
+            srr_baseline = mean(merged$safe_base) * 100,
+            srr_condition = mean(merged$safe_cond) * 100,
+            diff = mean(merged$safe_cond) * 100 - mean(merged$safe_base) * 100,
+            p_raw = test$p.value
+          )
+        }
+      }
+    }
+  }
+}
+baseline_pairwise_df <- bind_rows(baseline_pairwise_results) %>%
+  mutate(
+    p_holm = p.adjust(p_raw, method = "holm"),
+    sig_decrease = p_holm < 0.05 & diff < 0
+  )
+# e.g. Safe/early+middle significance by base model (paragraph 3):
+baseline_pairwise_df %>%
+  filter(prompt_type == "Safe", placement %in% c("early", "middle")) %>%
+  group_by(basemodel) %>%
+  summarise(n_sig_decrease = sum(sig_decrease), n_tested = n(), .groups = "drop") %>%
+  print()
+
+# -----------------------------------------------------------------------
+# (10c) Middle vs. early/late placement, balanced (macro-averaged) HCT accuracy
+# -----------------------------------------------------------------------
+hct_benchmark_data <- benchmark_data %>%
+  filter(!is.na(hct_correct)) %>%
+  mutate(hct_ok = as.logical(hct_correct))
+
+fisher_combine <- function(pvals) {
+  stat <- -2 * sum(log(pvals))
+  1 - pchisq(stat, df = 2 * length(pvals))
+}
+
+hct_placement_results <- list()
+for (bm in basemodel_order) {
+  for (rk in ranks) {
+    cond_data <- list(
+      early  = hct_benchmark_data %>% filter(basemodel == bm, rank == rk, placement == "early"),
+      middle = hct_benchmark_data %>% filter(basemodel == bm, rank == rk, placement == "middle"),
+      late   = hct_benchmark_data %>% filter(basemodel == bm, rank == rk, placement == "late")
+    )
+    for (comp in c("early", "late")) {
+      p_by_cell  <- c()
+      acc_middle <- c()
+      acc_comp   <- c()
+      for (bench in c("WildGuard", "BeaverTails")) {
+        for (pt in c("Unsafe", "Safe")) {
+          mid_cell  <- cond_data$middle %>% filter(benchmark == bench, prompt_type == pt)
+          comp_cell <- cond_data[[comp]] %>% filter(benchmark == bench, prompt_type == pt)
+          merged <- inner_join(
+            mid_cell  %>% select(index, hct_mid  = hct_ok),
+            comp_cell %>% select(index, hct_comp = hct_ok),
+            by = "index"
+          )
+          tab  <- table(mid = merged$hct_mid, comp = merged$hct_comp)
+          test <- mcnemar.test(tab, correct = TRUE)
+          key <- paste(bench, pt)
+          p_by_cell[key]  <- test$p.value
+          acc_middle[key] <- mean(merged$hct_mid) * 100
+          acc_comp[key]   <- mean(merged$hct_comp) * 100
+        }
+      }
+      hct_placement_results[[length(hct_placement_results) + 1]] <- tibble(
+        basemodel = bm, rank = rk, comparison = paste0("middle_vs_", comp),
+        balanced_hct_middle = mean(acc_middle),
+        balanced_hct_comp   = mean(acc_comp),
+        diff  = mean(acc_middle) - mean(acc_comp),
+        p_raw = fisher_combine(p_by_cell)
+      )
+    }
+  }
+}
+hct_placement_df <- bind_rows(hct_placement_results) %>%
+  mutate(
+    p_holm = p.adjust(p_raw, method = "holm"),
+    sig = p_holm < 0.05,
+    middle_larger = diff > 0
+  )
+cat(sprintf("[Balanced HCT] %d/24 comparisons favour middle placement; %d/24 significant\n",
+            sum(hct_placement_df$middle_larger), sum(hct_placement_df$sig & hct_placement_df$middle_larger)))                   
